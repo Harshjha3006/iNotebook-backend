@@ -5,7 +5,7 @@ const {body, validationResult } = require("express-validator");
 const router = express.Router();
 // Creating Create user endpoint
 router.post(
-  "/",
+  "/createUser",
   //Validating for constraints on input fields
  body("name", "Enter a valid name").isLength({ min: 3 }), 
  body("email", "Enter a valid email").isEmail(),
