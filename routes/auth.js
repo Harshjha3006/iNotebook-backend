@@ -1,6 +1,7 @@
 // importing required modules
 const express = require("express");
 const user = require("../models/user");
+const bcrypt = require('bcryptjs');
 const {body, validationResult } = require("express-validator");
 const router = express.Router();
 // Creating Create user endpoint
@@ -25,11 +26,11 @@ router.post(
     if(isUserEmail){
         return res.status(400).send("A User Already exists with this email");
     }
-    // Cheking if a user password already exists
-    let isUserPassword = await user.findOne({password : req.body.password});
-    if(isUserPassword){
-        return res.status(400).send("A User Already exists with this password");
-    }
+    // Encrypting the user password
+    let securePass = req.body.password;
+    const salt = await bcrypt.genSalt(10);
+    securePass = await bcrypt.hash(securePass,salt);
+    req.body.password = securePass;
     // Creating a new user and sending it as response
     let newUser = await user.create(req.body);
     res.json(newUser);
