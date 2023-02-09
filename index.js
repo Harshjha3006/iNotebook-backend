@@ -4,7 +4,8 @@ const app = express();
 const port = 5000;
 connectToMongo();
 app.use(express.json());
-app.use('/auth',require('./routes/auth'))
+app.use('/auth',require('./routes/auth'));
+app.use('/notes',require('./routes/notes'));
 app.get("/",(req,res)=>{
     res.send("Hello Harsh");
 })
