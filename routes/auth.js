@@ -3,10 +3,11 @@ const express = require("express");
 const user = require("../models/user");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fetchuser = require('../middleware/getuser')
 require('dotenv').config();
 const {body, validationResult } = require("express-validator");
 const router = express.Router();
-// Route 1 : Creating Create user endpoint
+// Route 1 : Creating Create user endpoint : No login required
 router.post(
   "/createUser",
   //Validating for constraints on input fields
@@ -43,7 +44,7 @@ router.post(
   }
 );
 
-// Route 2 : Creating Login Endpoint
+// Route 2 : Creating Login Endpoint : No login required
 router.post('/login',
 body("email","Enter a valid email").isEmail(),
 body("password","Don't enter a blank string").exists(),
@@ -63,13 +64,24 @@ async (req,res)=>{
   if(!passwordCompare){
     res.status(400).send("Login using correct credentials");
   }
-  const data = {
+  const payload = {
     user : {
-      email : user.email
+      email : currUser.email
     }
   }
   //Sending jwt token to user 
-  const authToken = jwt.sign(data,process.env.JWT_SECRET_KEY);
+  const authToken = jwt.sign(payload,process.env.JWT_SECRET_KEY);
   res.json({authToken});
+})
+
+// Route 3 : Get user details using token : login required
+router.post('/getUser',fetchuser,async (req,res)=>{
+   try{
+    const email = req.user.email;
+    const currUser = await user.find({email : email}).select("-password");
+    res.json(currUser);
+   }catch(err){
+    res.status(500).send("Internal sever error");
+   }
 })
 module.exports = router;
