@@ -41,4 +41,26 @@ router.get('/fetchNote',fetchuser,async (req,res)=>{
   let notes = await Note.find({user : currUser.id });
   res.json(notes);
 })
+
+// Route 3 : Update a Note,login required
+router.put('/updateNote/:id',fetchuser,async (req,res)=>{
+  const {title,description,tag} = req.body;
+  let newNote = {};
+  if(title)newNote.title = title;
+  if(description)newNote.description = description;
+  if(tag)newNote.tag = tag;
+  console.log(req.params.id);
+  const currUser = await user.findOne({email : req.user.email});
+  let currNote = await Note.findById(req.params.id);
+  console.log(currNote);
+  console.log(currUser);
+  if(!currNote){
+    return res.status(400).send("Note does not exist");
+  }
+  if(currNote.user.toString() !== currUser.id.toString()){
+    return res.status(400).send("Not allowed");
+  }
+  newNote = await Note.findByIdAndUpdate(req.params.id,newNote,{new : true});
+  res.json({newNote});
+})
 module.exports = router;
