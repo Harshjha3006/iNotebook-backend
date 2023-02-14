@@ -63,4 +63,18 @@ router.put('/updateNote/:id',fetchuser,async (req,res)=>{
   newNote = await Note.findByIdAndUpdate(req.params.id,newNote,{new : true});
   res.json({newNote});
 })
+
+//Route 4 : Deleting a Note,login required
+router.delete('/deleteNote/:id',fetchuser,async (req,res)=>{
+  const currUser = await user.findOne({email : req.user.email});
+  const currNote = await Note.findById(req.params.id);
+  if(!currNote){
+    return res.status(400).send("Note does not exist");
+  }
+  if(currUser.id.toString() !== currNote.user.toString()){
+    return res.status(400).send("Not Allowed");
+  }
+  await Note.findByIdAndDelete(req.params.id);
+  res.json({success : "Note has been delete"});
+})
 module.exports = router;
