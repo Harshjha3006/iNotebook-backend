@@ -45,6 +45,7 @@ router.get('/fetchNote',fetchuser,async (req,res)=>{
 // Route 3 : Update a Note,login required
 router.put('/updateNote/:id',fetchuser,async (req,res)=>{
   const {title,description,tag} = req.body;
+  console.log({title,description,tag});
   let newNote = {};
   if(title)newNote.title = title;
   if(description)newNote.description = description;
